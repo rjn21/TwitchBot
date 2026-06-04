@@ -25,6 +25,7 @@ public class CommandManager {
             String commandName = split[0].toLowerCase();
             String[] args = new String[split.length - 1];
             System.arraycopy(split, 1, args, 0, args.length);
+//            Hier wird in commands<key, value> geschaut, welche implementierung eines COmmands zum key gespeichert wird.
             CommandUseCase command = commands.get(commandName);
             if (command != null) {
                 command.execute(message, args);

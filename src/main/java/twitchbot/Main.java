@@ -38,6 +38,7 @@ public class Main {
         DuelManager duelManager = new DuelManager(scheduler, messageSender);
 
         CommandManager commandManager = new CommandManager(config.getPrefix());
+
         commandManager.registerCommand(new PingCommand(messageSender));
         commandManager.registerCommand(new HugCommand(messageSender));
         commandManager.registerCommand(new DuelCommand(duelManager, messageSender));
