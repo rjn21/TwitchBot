@@ -1,8 +1,12 @@
 package twitchbot.core.requests;
 
+import twitchbot.domain.model.ChatMessage;
+import twitchbot.domain.model.MessageContext;
+
 import java.util.concurrent.ScheduledFuture;
 
 public class PendingRequest<T> {
+//    private final MessageContext context;
     private final String channel;
     private final String sender;
     private final String target;

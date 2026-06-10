@@ -5,9 +5,12 @@ import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
 import twitchbot.adapters.inbound.TwitchChatEventHandler;
+import twitchbot.adapters.outbound.DiscordMessageSenderAdapter;
 import twitchbot.adapters.outbound.TwitchMessageSenderAdapter;
+import twitchbot.adapters.outbound.YoutubeMessageSenderAdapter;
 import twitchbot.config.BotConfig;
 import twitchbot.domain.ports.outbound.MessageSenderPort;
+import twitchbot.domain.ports.outbound.PlatformMessageRouter;
 import twitchbot.domain.usecases.CommandManager;
 import twitchbot.domain.usecases.DuelManager;
 import twitchbot.domain.usecases.KeywordManager;
@@ -31,28 +34,38 @@ public class Main {
                 .build();
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(4);
 
-        // 2. Outbound Adapter initialisieren
-        MessageSenderPort messageSender = new TwitchMessageSenderAdapter(twitchClient);
+        // Adapter initialisieren
+        TwitchMessageSenderAdapter twitchSender = new TwitchMessageSenderAdapter(twitchClient);
+        YoutubeMessageSenderAdapter youtubeSender = new YoutubeMessageSenderAdapter();
+        DiscordMessageSenderAdapter discordSender = new DiscordMessageSenderAdapter();
 
-        // 3. Domain Logic (Hexagon) zusammenbauen
-        DuelManager duelManager = new DuelManager(scheduler, messageSender);
+        // Router erstellen und adapter übergeben
+        MessageSenderPort messageRouter = new PlatformMessageRouter(twitchSender, youtubeSender, discordSender);
 
+        DuelManager duelManager = new DuelManager(scheduler, messageRouter);
+
+        // CommandManager initialisieren
         CommandManager commandManager = new CommandManager(config.getPrefix());
 
-        commandManager.registerCommand(new PingCommand(messageSender));
-        commandManager.registerCommand(new HugCommand(messageSender));
-        commandManager.registerCommand(new DuelCommand(duelManager, messageSender));
+        // Commands registrieren
+        commandManager.registerCommand(new PingCommand(messageRouter));
+        commandManager.registerCommand(new HugCommand(messageRouter));
+        commandManager.registerCommand(new DuelCommand(duelManager, messageRouter));
 
+        // KeywordManager initialisieren
         KeywordManager keywordManager = new KeywordManager();
-        keywordManager.registerTrigger(new RaufasertapeteTrigger(messageSender));
 
-        // 4. Inbound Adapter mit der Domain Logic verbinden
+        // Keywords registrieren
+        keywordManager.registerTrigger(new RaufasertapeteTrigger(messageRouter));
+
+        // EventHandler an TwitchClient geben
         TwitchChatEventHandler eventHandler = new TwitchChatEventHandler(
                 commandManager, keywordManager, config.getBotName(), config.getPrefix()
         );
+
         twitchClient.getEventManager().getEventHandler(SimpleEventHandler.class).registerListener(eventHandler);
 
-        // 5. Dem Chat beitreten
+        // Chat betretenm
         twitchClient.getChat().joinChannel(config.getChannelName());
         System.out.println("Bot [" + config.getBotName() + "] wurde erfolgreich mit Hexagonaler Architektur gestartet.");
     }

@@ -1,5 +1,7 @@
 package twitchbot.core.requests;
 
+import twitchbot.domain.model.MessageContext;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
@@ -36,8 +38,8 @@ public class RequestManager<T> {
         return true;
     }
 
-    public PendingRequest<T> acceptRequest(String channel, String target) {
-        String key = buildKey(channel, target);
+    public PendingRequest<T> acceptRequest(MessageContext context, String target) {
+        String key = buildKey(context.channelId(), target);
 
         PendingRequest<T> request = requests.remove(key);
 

@@ -1,6 +1,7 @@
 package twitchbot.domain.usecases.commands;
 
 import twitchbot.domain.model.ChatMessage;
+import twitchbot.domain.model.MessageContext;
 import twitchbot.domain.ports.inbound.CommandUseCase;
 import twitchbot.domain.ports.outbound.MessageSenderPort;
 
@@ -18,6 +19,7 @@ public class PingCommand implements CommandUseCase {
 
     @Override
     public void execute(ChatMessage message, String[] args) {
-        messageSender.sendMessage(message.channel(), "@" + message.sender() + " Pong! 🏓");
+        MessageContext context = new MessageContext(message.platform(), message.channelId());
+        messageSender.sendMessage(context, "@" + message.sender() + " Pong! 🏓");
     }
 }

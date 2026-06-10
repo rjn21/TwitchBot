@@ -1,6 +1,7 @@
 package twitchbot.domain.usecases.commands;
 
 import twitchbot.domain.model.ChatMessage;
+import twitchbot.domain.model.MessageContext;
 import twitchbot.domain.ports.inbound.CommandUseCase;
 import twitchbot.domain.ports.outbound.MessageSenderPort;
 
@@ -16,12 +17,13 @@ public class HugCommand implements CommandUseCase {
 
     @Override
     public void execute(ChatMessage message, String[] args) {
+        MessageContext context = new MessageContext(message.platform(), message.channelId());
         String receiver = args.length > 0 ? String.join(" ", args).trim() : "";
         if (receiver.isEmpty()) {
-            messageSender.sendMessage(message.channel(), message.sender() + " hugs themselves! :)");
+            messageSender.sendMessage(context, message.sender() + " hugs themselves! :)");
         } else {
             if (receiver.startsWith("@")) receiver = receiver.substring(1).trim();
-            messageSender.sendMessage(message.channel(), message.sender() + " hugs " + receiver + " :)");
+            messageSender.sendMessage(context, message.sender() + " hugs " + receiver + " :)");
         }
     }
 }

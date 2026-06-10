@@ -2,6 +2,7 @@ package twitchbot.domain.usecases;
 
 import twitchbot.core.requests.PendingRequest;
 import twitchbot.core.requests.RequestManager;
+import twitchbot.domain.model.MessageContext;
 import twitchbot.domain.ports.outbound.MessageSenderPort;
 
 import java.util.Random;
@@ -20,35 +21,35 @@ public class DuelManager {
         this.scheduler = scheduler;
     }
 
-    public void createChallenge(String channel, String challenger, String target) {
+    public void createChallenge(MessageContext context, String challenger, String target) {
         int minutes = 3;
         Runnable timeoutAction = () -> messageSender.sendMessage(
-                channel,
+                context,
                 "Das Duell zwischen @" + challenger + " und @" + target + " ist abgelaufen.");
 
-        PendingRequest<Void> request = new PendingRequest<>(channel, challenger, target, null);
+        PendingRequest<Void> request = new PendingRequest<>(context.channelId(), challenger, target, null);
         boolean success = requestManager.createRequest(request, minutes, timeoutAction);
 
 //        Fehlerhandling
         if (!success) {
             messageSender.sendMessage(
-                    channel,
+                    context,
                     "@" + challenger + ", dieser Nutzer hat bereits eine offene Herausforderung!");
             return;
         }
 
         messageSender.sendMessage(
-                channel,
+                context,
                 "⚔️ @" + target + "! Du wurdest von @" + challenger + " herausgefordert! Schreibe '!duell accept' zum Annehmen."
         );
     }
 
-    public void acceptChallenge(String channel, String target) {
-        PendingRequest<Void> challenge = requestManager.acceptRequest(channel, target);
+    public void acceptChallenge(MessageContext context, String target) {
+        PendingRequest<Void> challenge = requestManager.acceptRequest(context, target);
 
         if (challenge == null) {
             messageSender.sendMessage(
-                    channel,
+                    context,
                     "@" + target + ", du hast aktuell keine offenen Duell-Anfragen.");
             return;
         }
@@ -59,7 +60,7 @@ public class DuelManager {
             String loser = challengerWins ? challenge.getTarget() : challenge.getSender();
 
             messageSender.sendMessage(
-                    channel,
+                    context,
                     "🏆 ERGEBNIS: Nach einem harten und epischen Kampf triumphiert @" + winner + " über @" + loser + "! 🎉"
             );
         }, 10, TimeUnit.MINUTES);

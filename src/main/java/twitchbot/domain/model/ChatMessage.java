@@ -1,4 +1,4 @@
 package twitchbot.domain.model;
 
-public record ChatMessage(String channel, String sender, String text) {
+public record ChatMessage(Platform platform,String channelId, String sender, String text) {
 }

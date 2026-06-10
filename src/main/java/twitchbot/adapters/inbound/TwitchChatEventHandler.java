@@ -3,6 +3,7 @@ package twitchbot.adapters.inbound;
 import com.github.philippheuer.events4j.simple.domain.EventSubscriber;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import twitchbot.domain.model.ChatMessage;
+import twitchbot.domain.model.Platform;
 import twitchbot.domain.usecases.CommandManager;
 import twitchbot.domain.usecases.KeywordManager;
 
@@ -24,6 +25,7 @@ public class TwitchChatEventHandler {
         if (event.getUser().getName().equalsIgnoreCase(botName)) return;
 
         ChatMessage cleanMessage = new ChatMessage(
+                Platform.TWITCH,
                 event.getChannel().getName(),
                 event.getUser().getName(),
                 event.getMessage()

@@ -1,5 +1,7 @@
 package twitchbot.domain.ports.outbound;
 
+import twitchbot.domain.model.MessageContext;
+
 public interface MessageSenderPort {
-    void sendMessage(String channel, String message);
+    void sendMessage(MessageContext context, String message);
 }

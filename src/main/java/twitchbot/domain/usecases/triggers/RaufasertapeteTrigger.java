@@ -1,6 +1,7 @@
 package twitchbot.domain.usecases.triggers;
 
 import twitchbot.domain.model.ChatMessage;
+import twitchbot.domain.model.MessageContext;
 import twitchbot.domain.ports.inbound.ChatTriggerUseCase;
 import twitchbot.domain.ports.outbound.MessageSenderPort;
 
@@ -16,6 +17,7 @@ public class RaufasertapeteTrigger implements ChatTriggerUseCase {
 
     @Override
     public void execute(ChatMessage message) {
-        messageSender.sendMessage(message.channel(), "@" + message.sender() + " Bernd das Brot wäre stolz auf dich! 🍞");
+        MessageContext context = new MessageContext(message.platform(), message.channelId());
+        messageSender.sendMessage(context, "@" + message.sender() + " Bernd das Brot wäre stolz auf dich! 🍞");
     }
 }
