@@ -1,13 +1,11 @@
 package twitchbot.core.requests;
 
-import twitchbot.domain.model.ChatMessage;
 import twitchbot.domain.model.MessageContext;
 
 import java.util.concurrent.ScheduledFuture;
 
 public class PendingRequest<T> {
-//    private final MessageContext context;
-    private final String channel;
+    private final MessageContext context;
     private final String sender;
     private final String target;
     private final T additionalData;
@@ -22,15 +20,15 @@ public class PendingRequest<T> {
 
     private ScheduledFuture<?> timeoutTask;
 
-    public PendingRequest(String channel, String sender, String target, T additionalData) {
-        this.channel = channel;
+    public PendingRequest(MessageContext context, String sender, String target, T additionalData) {
+        this.context = context;
         this.sender = sender;
         this.target = target;
         this.additionalData = additionalData;
     }
 
-    public String getChannel() {
-        return channel;
+    public MessageContext getContext() {
+        return context;
     }
 
     public String getSender() {

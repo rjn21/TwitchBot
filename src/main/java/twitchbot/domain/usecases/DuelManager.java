@@ -27,7 +27,7 @@ public class DuelManager {
                 context,
                 "Das Duell zwischen @" + challenger + " und @" + target + " ist abgelaufen.");
 
-        PendingRequest<Void> request = new PendingRequest<>(context.channelId(), challenger, target, null);
+        PendingRequest<Void> request = new PendingRequest<>(context, challenger, target, null);
         boolean success = requestManager.createRequest(request, minutes, timeoutAction);
 
 //        Fehlerhandling

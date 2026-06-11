@@ -1,5 +1,6 @@
 package twitchbot.core.requests;
 
+import okhttp3.internal.ws.RealWebSocket;
 import twitchbot.domain.model.MessageContext;
 
 import java.util.Map;
@@ -16,16 +17,16 @@ public class RequestManager<T> {
         this.scheduler = scheduler;
     }
 
-    private String buildKey(String channel, String target) {
-        return channel.toLowerCase() + ":" + target.toLowerCase();
+    private String buildKey(MessageContext context, String target) {
+        return context.channelId().toLowerCase() + ":" + target.toLowerCase();
     }
 
     public boolean createRequest(PendingRequest<T> request, int timeoutMinutes, Runnable onTimeout) {
-        String key = buildKey(request.getChannel(), request.getTarget());
+        String key = buildKey(request.getContext(), request.getTarget());
 
         if (requests.containsKey(key)) {
             return false;
-        } ;
+        }
 
         var timeoutTask = this.scheduler.schedule(() -> {
             if (requests.remove(key) != null) {
@@ -39,7 +40,7 @@ public class RequestManager<T> {
     }
 
     public PendingRequest<T> acceptRequest(MessageContext context, String target) {
-        String key = buildKey(context.channelId(), target);
+        String key = buildKey(context, target);
 
         PendingRequest<T> request = requests.remove(key);
 
