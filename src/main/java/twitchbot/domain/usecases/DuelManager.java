@@ -58,11 +58,10 @@ public class DuelManager {
             boolean challengerWins = random.nextBoolean();
             String winner = challengerWins ? challenge.getSender() : challenge.getTarget();
             String loser = challengerWins ? challenge.getTarget() : challenge.getSender();
-
             messageSender.sendMessage(
                     context,
                     "🏆 ERGEBNIS: Nach einem harten und epischen Kampf triumphiert @" + winner + " über @" + loser + "! 🎉"
             );
-        }, 10, TimeUnit.MINUTES);
+        }, 10, TimeUnit.SECONDS);
     }
 }
